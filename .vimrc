@@ -15,6 +15,7 @@ Plugin 'altercation/vim-colors-solarized'
 "Plugin 'vim-airline/vim-airline-themes'
 "Plugin 'tpope/vim-surround'
 Plugin 'scrooloose/nerdtree'
+Plugin 'ervandew/supertab'
 "Plugin 'terryma/vim-multiple-cursors'
 
 
