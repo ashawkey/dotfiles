@@ -1,0 +1,51 @@
+#! /bin/bash
+#set -euxo pipefail
+
+if [ $# -ne 2 ]
+then
+    echo "[ERROR] Usage: ssport oldPort newPort"
+    exit 1
+fi
+
+oldPort=$1
+newPort=$2
+
+echo "[INFO] try to change $oldPort to $newPort"
+
+config="/etc/shadowsocks.json"
+configbk="/etc/shadowsocks.json.bk"
+
+cp $config $configbk
+
+sed -i -e "s|\"$oldPort\"|\"$newPort\"|" $config
+if ! diff $config $configbk &> /dev/null
+then
+    echo "[INFO] config file after modified:"
+    cat $config
+    echo "[INFO] end"
+else
+    rm $configbk
+    echo "[ERROR] Quited, oldPort not found or no change is made" 
+    exit 1
+fi
+
+read -p "[PROMPT] Restart shadowsocks? [y/n]" -r
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    echo "[INFO] Modifying firewall..."
+    firewall-cmd --remove-port=${oldPort}/tcp --permanent
+    firewall-cmd --remove-port=${oldPort}/udp --permanent
+    firewall-cmd --add-port=${newPort}/tcp --permanent
+    firewall-cmd --add-port=${newPort}/udp --permanent
+    firewall-cmd --reload
+    echo "[INFO] Restarting shadowsocks..."
+    systemctl restart shadowsocks
+    systemctl status shadowsocks -l
+    echo "[SUCCESS] Modified and backed up."
+    exit 0
+else
+    cp $configbk $config
+    rm $configbk
+    echo "[QUIT] Config not modified."
+    exit 0
+fi
