@@ -1,2 +1,3 @@
-# VimConfig
-vim configurations and one click install script
+# LinuxConfig
+vim configurations and one click install script.
+ssport to change shadowsocks ports.
