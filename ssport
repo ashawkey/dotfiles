@@ -1,9 +1,15 @@
 #! /bin/bash
 #set -euxo pipefail
 
+config="/etc/shadowsocks.json"
+configbk="/etc/shadowsocks.json.bk"
+
 if [ $# -ne 2 ]
 then
+    echo "[INFO] Current config:"
+    cat $config
     echo "[ERROR] Usage: ssport oldPort newPort"
+    echo "               ssport newPort Password"
     exit 1
 fi
 
@@ -12,24 +18,32 @@ newPort=$2
 
 echo "[INFO] try to change $oldPort to $newPort"
 
-config="/etc/shadowsocks.json"
-configbk="/etc/shadowsocks.json.bk"
 
 cp $config $configbk
 
-sed -i -e "s|\"$oldPort\"|\"$newPort\"|" $config
-if ! diff $config $configbk &> /dev/null
+# modify
+if grep "\"$oldPort\"" $config &> /dev/null
 then
-    echo "[INFO] config file after modified:"
-    cat $config
-    echo "[INFO] end"
+    sed -i -e "s|\"$oldPort\"|\"$newPort\"|" $config
 else
-    rm $configbk
-    echo "[ERROR] Quited, oldPort not found or no change is made" 
-    exit 1
+    echo "[INFO] oldPort not found, try to add a new Port_Password pair."
+    sed -i -e "/port_password/a \\\t\"$oldPort\": \"$newPort\"," $config
 fi
 
-read -p "[PROMPT] Restart shadowsocks? [y/n]" -r
+# diff and show modification
+if diff $config $configbk &> /dev/null
+then
+    echo "[ERROR] Config not modified."
+    rm $configbk
+    exit 1
+else
+    echo "[INFO] Config file after modified:"
+    cat $config
+    echo "[INFO] end"
+fi
+
+
+read -p "[INFO] Restart shadowsocks? [y/n]" -r
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
     echo "[INFO] Modifying firewall..."
@@ -46,6 +60,6 @@ then
 else
     cp $configbk $config
     rm $configbk
-    echo "[QUIT] Config not modified."
+    echo "[ERROR] Config not modified."
     exit 0
 fi
