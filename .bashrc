@@ -7,7 +7,7 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 
 alias le="less -S"
-alias W="cd /data/hawkey"
+alias W="cd /home/hawkey/Workspace"
 alias nvi="nvidia-smi"
 alias rmr="rm -r"
 alias cpr="cp -r"
