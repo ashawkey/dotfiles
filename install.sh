@@ -1,9 +1,6 @@
 #! /bin/bash
 set -euxo pipefail
 
-# to home
-cd
-
 # bash
 cat .bashrc >> ~/.bashrc
 
