@@ -26,3 +26,6 @@ export PS1='\u@\h:\[\e[33m\]\w\[\e[0m\]\$ '
 
 # fix 777 color
 export LS_COLORS="$LS_COLORS:ow=1;34:tw=1;34:"
+
+# bin
+export PATH="$PATH:~/bin"
