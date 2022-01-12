@@ -2,8 +2,6 @@
 set -euxo pipefail
 
 # bash
-cd ~
-mkdir -p bin
 cat .bashrc >> ~/.bashrc
 
 # vim
